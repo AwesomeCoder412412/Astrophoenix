@@ -805,8 +805,14 @@ return (
       >
       <h1 style={{ margin: "0 0 8px", color: "#fff", letterSpacing: 10 }}>🔥AstroPhoenix</h1>
       <p style={{ color: "#ccc", margin: "0 0 16px" }}>
-        Search keywords and research questions across all 608 papers.
+        Search keywords and research questions across all 608 papers. 
       </p>
+
+      <h4 style={{ margin: "0 0 16px", color: "#820303ff"}}>
+        Ask a question with a mark, get a AI answer based on the most relevant papers!
+      </h4>
+      
+      
 
       {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
 
