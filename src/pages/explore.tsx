@@ -53,6 +53,7 @@ export default function ExplorePage() {
           year = m ? m[0] : year;
         }
         const summary = data.summary || data.abstract || undefined;
+        
         setMetaMap((prev) => ({ ...(prev || {}), [file]: { authors, year, summary } }));
         return;
       }
@@ -70,7 +71,13 @@ export default function ExplorePage() {
       const authors = authorMatch ? authorMatch[1].trim() : undefined;
       const yearMatch = head.match(/(19|20)\d{2}/);
       const year = yearMatch ? yearMatch[0] : undefined;
-      const summary = text.slice(0, 240).trim();
+
+      const summaryURL = BASE_URL + "summaries/" + encodeURIComponent(file);
+      const rr = await fetch(summaryURL);
+      if (!rr.ok) return;
+      const summary = await rr.text();
+
+     //const summary = text.slice(0, 240).trim();
       if (authors || year || summary) setMetaMap((prev) => ({ ...(prev || {}), [file]: { authors, year, summary } }));
     } catch (e) {
       // ignore
