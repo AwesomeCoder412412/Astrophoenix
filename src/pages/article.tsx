@@ -26,21 +26,34 @@ function chunkText(text: string, target = 12000): string[] {
   return out;
 }
 
-async function summarizeWithAI(fullText: string): Promise<string> {
-  const CHUNK_LIMIT = 12000; // characters; tune if your model allows more
+async function askAboutArticle(fullText: string, question: string): Promise<string> {
+  const CHUNK_LIMIT = 12000; // chars; tune to your model
+
   if (fullText.length <= CHUNK_LIMIT) {
-    const prompt = fullText;
-    // If your call_gpt API differs, swap the next line to match it.
-    return await askGPT(prompt, "summarize");
+    const prompt = `Question:\n${question}\n\n=== ARTICLE START ===\n${fullText}\n=== ARTICLE END ===`;
+    return await askGPT(prompt, "question"); // if your helper ignores the 2nd arg, it's fine
   }
+
   const chunks = chunkText(fullText, CHUNK_LIMIT);
   const partials: string[] = [];
+
   for (let i = 0; i < chunks.length; i++) {
-    const prompt = `\n\n(Chunk ${i + 1}/${chunks.length})\n${chunks[i]}`;
-    partials.push(await askGPT(prompt, "summarize"));
+    const prompt =
+      `Question:\n${question}\n\n` +
+      "From this chunk only, extract the minimal facts/quotes that answer the question. " +
+      'If nothing relevant, reply exactly: NO EVIDENCE.\n\n' +
+      `(Chunk ${i + 1}/${chunks.length})\n${chunks[i]}`;
+    partials.push(await askGPT(prompt, "question"));
   }
-  const synthPrompt = partials.map((p, i) => `Chunk ${i + 1}:\n${p}`).join("\n\n---\n\n");
-  return await askGPT(synthPrompt, "summarize");
+
+  const evidence = partials.filter(p => !/^NO EVIDENCE/i.test(p)).join("\n\n");
+  const synthPrompt =
+    `Question:\n${question}\n\n` +
+    "Synthesize the following extracted notes into one answer. Do not invent facts. " +
+    "Combine duplicates, keep numeric details, and keep it brief.\n\n=== NOTES ===\n" +
+    (evidence || "(none)");
+
+  return await askGPT(synthPrompt, "question");
 }
 
 function titleFromFirstLine(raw: string, fallback: string): string {
@@ -76,11 +89,16 @@ export default function ArticlePage() {
   const [summarizing, setSummarizing] = useState(false);
   const [summary, setSummary] = useState<string>("");
 
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [asking, setAsking] = useState(false);
+
   useEffect(() => {
     async function fetchDoc(rawId: string) {
       try {
         setLoading(true);
         setErr(null);
+        setAnswer("");
 
         const summaryURL = BASE_URL + "summaries/" + rawId + ".txt";
         const rr = await fetch(summaryURL);
@@ -119,19 +137,22 @@ export default function ArticlePage() {
     }
   }, [id]);
 
-  async function handleSummarize() {
-    if (!doc?.text) return;
+  async function handleAsk(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (!doc?.text || !question.trim()) return;
     try {
-      setSummarizing(true);
-      const s = await summarizeWithAI(doc.text);
-      setSummary(s.trim());
+      setAsking(true);
+      setAnswer("");
+      const a = await askAboutArticle(doc.text, question.trim());
+      setAnswer(a.trim());
     } catch (e: any) {
-      setSummary("");
-      setErr(`Summarization failed: ${e?.message || e}`);
+      setAnswer("");
+      setErr(`Q&A failed: ${e?.message || e}`);
     } finally {
-      setSummarizing(false);
+      setAsking(false);
     }
   }
+
 
   return (
     <div
@@ -209,15 +230,6 @@ export default function ArticlePage() {
               {doc.title}
             </h1>
 
-            <div style={{ 
-              marginTop: 16, 
-              display: "flex", 
-              gap: 12}}>
-              <button onClick={handleSummarize} disabled={summarizing}>
-                {summarizing ? "Summarizing…" : "Summarize"}
-              </button>
-            </div>
-
             {summary && (
               <section
                 style={{
@@ -233,6 +245,39 @@ export default function ArticlePage() {
                 {summary}
               </section>
             )}
+
+            <form onSubmit={handleAsk} style={{ marginTop: 16, display: "flex", gap: 8 }}>
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="Ask a question about this article…"
+                style={{
+                  flex: 1,
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1px solid #ccc",
+                  outline: "none",
+                }}
+              />
+              <button type="submit" disabled={asking || !question.trim()}>
+                {asking ? "Answering…" : "Ask"}
+              </button>
+            </form>
+
+            {answer && (
+              <section
+                style={{
+                  marginTop: 20,
+                  padding: "16px 18px",
+                  background: "#f6f5fb",
+                  border: "1px solid #e8e6f5",
+                  borderRadius: 12,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {answer}
+              </section>
+              )}
 
             <a
               href={doc.sourceUrl}
