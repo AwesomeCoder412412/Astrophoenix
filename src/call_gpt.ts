@@ -10,9 +10,9 @@ import { useApiKey } from "./context/ApiKeyContext";
 
 export default async function askGPT(prompt: string, call_type: string) : Promise<string> {
   try {
-    const { apiKey } = useApiKey();
+   const apiKey = localStorage.getItem("openai_api_key");
    console.log("Current API Key:", apiKey);
-    const client = new OpenAI({ apiKey: apiKey!});
+    const client = new OpenAI({ apiKey: apiKey!,dangerouslyAllowBrowser: true });
     var sys = ""
     var use = ""
 

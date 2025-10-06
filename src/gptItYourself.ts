@@ -5,9 +5,9 @@ import { useApiKey } from "./context/ApiKeyContext";
 
 export default async function askGPT(sys: string, use: string) : Promise<string> {
   try {
-const { apiKey } = useApiKey();
+const apiKey = localStorage.getItem("openai_api_key");
    console.log("Current API Key:", apiKey);
-    const client = new OpenAI({ apiKey: apiKey!});
+    const client = new OpenAI({ apiKey: apiKey!,dangerouslyAllowBrowser: true });
     const response = await client.chat.completions.create({
       model: "gpt-4.1-nano",
       messages: [
