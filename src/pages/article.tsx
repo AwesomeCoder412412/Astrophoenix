@@ -315,8 +315,8 @@ export default function ArticlePage() {
                 style={{
                   marginTop: 20,
                   padding: "16px 18px",
-                  background: "#f6f5fb",
-                  border: "1px solid #e8e6f5",
+                  background: "#110c2dff",
+                  border: "1px solid #867fb7ff",
                   borderRadius: 12,
                   whiteSpace: "pre-wrap",
                 }}
