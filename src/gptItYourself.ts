@@ -1,13 +1,13 @@
 import OpenAI from "openai";
 import "dotenv";
+import { useApiKey } from "./context/ApiKeyContext";
 
-const client = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY, dangerouslyAllowBrowser: true,
-});
 
 export default async function askGPT(sys: string, use: string) : Promise<string> {
   try {
-
+const { apiKey } = useApiKey();
+   console.log("Current API Key:", apiKey);
+    const client = new OpenAI({ apiKey: apiKey!});
     const response = await client.chat.completions.create({
       model: "gpt-4.1-nano",
       messages: [
