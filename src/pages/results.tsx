@@ -206,7 +206,7 @@ export default function ResultsPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
                     <Link to={`/article/${encodeURIComponent(r.id)}`} style={{ textDecoration: "none", color: "#fff", fontFamily: "Lucida Console, Lucida Sans Typewriter, monaco, Bitstream Vera Sans Mono, monospace" }}>
-                      <span dangerouslySetInnerHTML={{ __html: highlightHtml(r.title, activeQuery) }} />
+                      <span dangerouslySetInnerHTML={{ __html: highlightHtml(r.title + "...", activeQuery) }} />
                     </Link>
                   </div>
                   <div style={{ fontSize: 13, color: "#ccc", marginBottom: 8 }}>{r.matches ? `${r.matches} match(es)` : ""}</div>
