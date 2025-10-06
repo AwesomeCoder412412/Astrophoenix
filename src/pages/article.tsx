@@ -27,7 +27,7 @@ function chunkText(text: string, target = 12000): string[] {
 }
 
 async function askAboutArticle(fullText: string, question: string): Promise<string> {
-  const CHUNK_LIMIT = 12000; // chars; tune to your model
+  const CHUNK_LIMIT = 999999999; // chars; tune to your model
 
   if (fullText.length <= CHUNK_LIMIT) {
     const prompt = `Question:\n${question}\n\n=== ARTICLE START ===\n${fullText}\n=== ARTICLE END ===`;
