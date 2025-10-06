@@ -81,7 +81,12 @@ export default function ArticlePage() {
       try {
         setLoading(true);
         setErr(null);
-        setSummary("");
+
+        const summaryURL = BASE_URL + "summaries/" + rawId + ".txt";
+        const rr = await fetch(summaryURL);
+        if (!rr.ok) return;
+        const summary = await rr.text();
+        setSummary(summary);
 
         const baseId = decodeURIComponent(rawId);               // you index without extensions
         const filename = /\.[a-z0-9]+$/i.test(baseId) ? baseId : `${baseId}.txt`;
