@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import type { SearchResult } from "../types";
 import { useResults } from "../context/ResultsContext";
 import Fuse from "fuse.js";
+import AIU from "../gptItYourself";
 
 function escapeRegex(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -73,7 +74,7 @@ export default function ResultsPage() {
   const [activeQuery, setActiveQuery] = useState<string>(initialQuery);
 
   // perform an in-place fuzzy search over the current result set (or reset when empty)
-  function performLocalSearch(q: string) {
+  async function performLocalSearch(q: string) {
     const trimmed = q.trim();
   setActiveQuery(trimmed);
     if (!trimmed) {
@@ -106,8 +107,23 @@ export default function ResultsPage() {
         minMatchCharLength: 2,
       });
       const fr = fuse.search(trimmed, { limit: 1000 });
+      const mapped2: SearchResult[] = [];
       const mapped: SearchResult[] = fr.map((r) => ({ ...(r.item as SearchResult) }));
+       if (q.includes("?")) {
+              mapped2.push({
+                id: "AI",
+                title: "AI Summary",
+                excerpt: "AI Summary is only avaliable from the main search bar, go back to search!",
+                score: 0,
+                matches: 1,
+                content: "",
+                url: ""
+              });
+             setResults(mapped2)
+          } else {
   setResults(mapped);
+          }
+
   setPage(1);
     } catch (e) {
       // fallback: simple substring filter
