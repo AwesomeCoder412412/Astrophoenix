@@ -20,6 +20,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { setPersistence, browserLocalPersistence } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 import { ApiKeyProvider, useApiKey } from "./context/ApiKeyContext";
+import { sum } from "firebase/firestore";
 
 
 /**
@@ -595,13 +596,20 @@ function SearchPage() {
       const score = Math.round(((fr.score ?? 1) * 100)) + 50;
       const pos = d.content.toLowerCase().indexOf(q.toLowerCase());
       const excerpt = pos !== -1 ? makeExcerpt(d.content, pos, q.length) : d.content.slice(0, 250) + (d.content.length > 250 ? "…" : "");
+
+
+      const summaryURL = BASE_URL + "summaries/" + d.title + ".txt";
+              const rr = await fetch(summaryURL);
+              if (!rr.ok) return;
+              const summary = await rr.text();
+
       hitsMap.set(d.id, {
         id: d.id,
         title: d.title,
         excerpt,
         score,
         matches: 0,
-        content: d.content,
+        content: summary,
         url: d.url,
       });
     }

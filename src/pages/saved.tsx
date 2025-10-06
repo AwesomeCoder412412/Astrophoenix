@@ -49,7 +49,7 @@ export default function SavedPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", fontFamily: "Lucida Console, Lucida Sans Typewriter, monaco, Bitstream Vera Sans Mono, monospace"}}>{s.title}</div>
-                <div style={{ whiteSpace: "pre-wrap", marginTop: 8, color: "#ccc" }}>{s.excerpt}</div>
+                <div style={{ whiteSpace: "pre-wrap", marginTop: 8, color: "#ccc" }}>{s.content}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
                 <button
