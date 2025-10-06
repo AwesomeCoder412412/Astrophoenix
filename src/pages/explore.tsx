@@ -150,7 +150,7 @@ export default function ExplorePage() {
                   </svg>
                 </button>
 
-                <div style={{ fontWeight: 700, color: '#fff', paddingRight: 44 }}>{it.title}</div>
+                <div style={{ fontWeight: 700, color: '#fff', paddingRight: 44 }}>{it.title + "..."}</div>
 
                 <div style={{ marginTop: 8, fontSize: 13, color: '#aaa', lineHeight: 1.4 }}>{summary}</div>
 
