@@ -318,6 +318,7 @@ function SearchPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -467,6 +468,7 @@ function SearchPage() {
 
   // search function using hybrid approach
   async function doSearch(q: string) {
+    setIsLoading(true);
    /* q = q.trim()
    const result = AI(q, "classify");
    console.log(await result)
@@ -666,10 +668,12 @@ function SearchPage() {
     }
     // navigate to results page
     try {
+        setIsLoading(false);
       navigate("/results");
     } catch (e) {
       // ignore
     }
+    setIsLoading(false);
   }
 
   // excerpt helper
@@ -714,8 +718,56 @@ function SearchPage() {
   const totalPages = Math.max(1, Math.ceil(results.length / pageSize));
   const pageResults = results.slice((page - 1) * pageSize, page * pageSize);
 
+
+  
 return (
   <>
+
+  {isLoading && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      background: "rgba(0,0,0,0.7)",
+      backdropFilter: "blur(6px)",
+      zIndex: 9999,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      color: "#fff",
+      fontFamily:
+        "Lucida Console, Lucida Sans Typewriter, monaco, Bitstream Vera Sans Mono, monospace",
+    }}
+  >
+    <div
+      style={{
+        width: 100,
+        height: 100,
+        borderRadius: "50%",
+        border: "4px solid rgba(133,99,246,0.2)",
+        borderTopColor: "#bba4ff",
+        animation: "spin 1.4s linear infinite",
+        marginBottom: 24,
+      }}
+    />
+    <div style={{ fontSize: 18, letterSpacing: 1 }}>
+      Searching the cosmos...
+    </div>
+
+    <style>
+      {`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}
+    </style>
+  </div>
+)}
     <Starfield />
     <div
       style={{
